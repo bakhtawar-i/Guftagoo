@@ -35,15 +35,31 @@ rest of the platform are future work, out of scope here.
 
 ### Brand direction (carry this forward)
 
-- **Palette:** butter-yellow background (~`#FDE47F`) as the dominant tone,
-  deep navy (~`#14304A`) for text and grounding sections, a single bright
-  cyan accent (~`#1FB6D8`) used sparingly for buttons/highlights. Avoid
-  introducing new colors outside this set.
+- **Palette (final — matches the live code, keep as is):**
+  - Cream `#f9f5eb` — the dominant page background (lighter panels and
+    form inputs use `#fffdf8`)
+  - Deep navy `#1c214a` — text, buttons, and the dark "Why this exists"
+    section and footer
+  - Cyan `#1d9fb6` — the accent for highlights, focus states and checked
+    options (a lighter `#55c8cb` is used on navy; the hero logo card is
+    `#27b0c7`)
+  - Warm amber `#f5ba52` — the closing call-to-action section and small
+    highlights (button arrow circles, the "make room" badge)
+  - Mint `#e7f5f2` / `#bfe9e7` — the "How it works" section and soft
+    background shapes
+  - Muted grey `#52536a` — secondary body text
+
+  Avoid introducing new colors outside this set.
 - **Logo:** the word "گفتگو" (Guftagoo) set in the Aref Ruqaa Urdu typeface,
   paired with "GUFTAGOO" in Latin small caps. In the nav, this appears as a
   circular badge — cyan circle background with the navy Urdu wordmark inside
   — sized large enough to actually be legible (at least ~44–48px), not a
-  tiny illegible smudge.
+  tiny illegible smudge. *Deferred until after the Vercel launch* — see
+  Section 2 for the current state.
+- **Fonts (current):** Instrument Serif (headlines), DM Sans (body text),
+  Space Mono (small uppercase labels). Aref Ruqaa is **not** loaded yet — the
+  Urdu wordmark currently exists only inside the PNG logo image. Font work is
+  deferred until after the Vercel launch, together with the logo.
 - **Tone:** warm, human, editorial — not generic tech/SaaS. No mascot or
   cartoon character; personality comes from copy voice and the Urdu wordmark
   itself, not an illustrated character.
@@ -52,40 +68,71 @@ rest of the platform are future work, out of scope here.
 
 ## 2. What was already built (on Replit)
 
-An AI-agent-built version of this landing page already exists on Replit
-(free/Starter plan). It included:
+*Verified against the codebase on 2026-09-26. The page lives in
+`artifacts/guftagoo/src/App.tsx`.*
 
-- **Hero section** — headline, subhead, primary CTA, a tilted phone-style
-  mockup graphic showing the Urdu wordmark on a cyan card, and a location
-  line ("Lahore · Karachi · Islamabad · Everywhere").
-- **"Why this exists" section** — a navy full-bleed section with a strong
-  founder's-note-style quote about referrals and opportunity.
-- **A three-card supporting section** ("What a little time can do") that
-  was judged redundant with the quote section above it — **this should be
-  cut or merged into a single short line, not rebuilt as-is.**
-- **"How it works" section** — four numbered steps: Sign up → Get verified →
-  Get matched → Give back, each with a one-line description.
-- **Closing CTA section** on a warm/orange background repeating the
-  "Sign up as a Mentor" button.
-- **A signup form** ("Bring what you know") collecting: name, email, and a
-  single "Where can you help?" dropdown. This field was identified as
-  ambiguous and should be **split into two fields** in the rebuild:
-  - Field/industry (e.g. Tech, Finance, Medicine, Law, Marketing, etc.)
-  - How they'd like to help (multi-select: Referrals / Career advice / Mock
-    interviews)
-  A **years-of-experience field** should also be added (simple number input
-  or a range like 0–2 / 3–5 / 6–10 / 10+), since mentor seniority will
-  eventually matter for matching.
-- **Backend/persistence work in progress on Replit**, including tasks to
-  save mentor signups reliably (so submissions aren't lost on refresh),
-  give the team a private way to review captured signups, and measure
-  completed signups without storing unnecessary personal data. This work
-  was **not finished** before moving off Replit — the underlying
-  Replit-managed database does not travel with the exported code and will
-  need to be rebuilt against the new backend (see below).
+An AI-agent-built version of this landing page exists and was exported from
+Replit. The page, top to bottom:
 
-The full project code was exported from Replit as a ZIP (not via Git, due
-to a plan limitation) and is the starting point for this handoff.
+- **Header / nav** — logo on the left; "Why Guftagoo", "How it works" and a
+  "Sign up as a Mentor" button on the right (collapses into a menu on
+  mobile).
+- **Hero section** — a small pill label ("A community built on
+  generosity"), the headline "Your next *conversation* could change a
+  life.", and the subhead "Guftagoo connects experienced Pakistanis with
+  people finding their way into the careers they've been dreaming about."
+  Primary "Sign up as a Mentor" button, plus a secondary "See how it works"
+  text link. On the right, a tilted cyan card showing the logo image, with
+  a "Give what you know" tag, an amber "make room" circle badge, and the
+  location line "Lahore · Karachi · Islamabad · everywhere".
+- **"Why this exists" section** — navy full-bleed section. Side note:
+  "Because a closed door is often just a missing introduction." Quote:
+  "Someone once made space for me at the table. *Guftagoo is how we pass
+  the chair on.*"
+- **Three-card "What a little time can do" section** — ✅ **already
+  removed.** No further work needed.
+- **"How it works" section** (mint background) — "Four steps. *One
+  ripple.*" with four numbered steps: Sign up → Get verified → Get matched
+  → Give back, each with a one-line description, followed by a "Sign up as
+  a Mentor" button.
+- **Closing CTA section** (amber background) — "Your seat is waiting" /
+  "Have a little *guftagoo.*" with "The best thing you can give someone at
+  the beginning is proof that they belong in the room." and the "Sign up as
+  a Mentor" button.
+- **Footer** (navy) — logo, "Conversations that make room for what's next.",
+  "Back to top" link, "Made for Pakistanis, everywhere".
+- **Signup form** — ✅ **field split already done.** It opens as a pop-up
+  window from any "Sign up as a Mentor" button. Heading "Bring what you
+  know." Fields (all required):
+  - Name
+  - Email
+  - Field — Technology & engineering / Product & design / Finance &
+    consulting / Medicine & healthcare / Law & policy / Marketing &
+    communications / Education & research / Other
+  - Years of experience — 0–2 / 3–5 / 6–10 / 10+ years
+  - How would you like to help? — checkboxes, pick at least one: Referrals /
+    Career advice / Mock interviews
+
+  On success it shows "You're on the list." with a thank-you message. If
+  saving fails it shows an error and lets the person try again.
+- **Nav logo sizing** — ⏳ **still open, deferred until after the Vercel
+  launch.** The nav and footer currently show the whole square logo image
+  (`public/guftagoo-mark.png`) at 64px. It isn't a circle, and the Urdu text
+  is only a small part of the image, so it shows up tiny. The image already
+  contains "GUFTAGOO", and the same word is repeated as text beside it. In
+  the footer that text is navy on navy and effectively invisible.
+- **Backend (current state)** — a separate Express API server
+  (`artifacts/api-server`) with one endpoint, `POST /api/mentor-signups`,
+  which validates the form and saves it to a Postgres database through
+  Drizzle, connecting via a `DATABASE_URL` environment variable
+  (`lib/db`). The table `mentor_signups` stores: id, name, email, field,
+  years_experience, help_options (list), created_at. Automated tests exist
+  for this endpoint and for the form logic.
+  **Not built yet:** a private way for the team to review signups, and
+  signup counts. The Replit-managed database did not travel with the export,
+  so any signups collected on Replit are not here.
+
+The project code was exported from Replit and is now on GitHub.
 
 ## 3. Immediate next steps (this task)
 
@@ -95,8 +142,8 @@ Move the project off Replit entirely and onto a self-owned stack:
    Audit it for anything tied specifically to Replit's managed database or
    environment (e.g. `DATABASE_URL` references, Replit-specific config) —
    this logic needs to be replaced, not just copied over.
-2. **Initialize Git and push to GitHub** (the export did not include Git
-   history), so the project has proper version control going forward.
+2. ~~**Initialize Git and push to GitHub**~~ — ✅ done; the project is on
+   GitHub.
 3. **Stand up a Supabase project** to replace Replit's database:
    - Recreate the mentor-signup table with fields: name, email, field/
      industry, years of experience, how they'd like to help (multi-select).
@@ -108,9 +155,10 @@ Move the project off Replit entirely and onto a self-owned stack:
 5. **Deploy via Vercel** — connect the GitHub repo, add the same Supabase
    environment variables in Vercel's project settings, and deploy to get a
    production URL.
-6. **Apply the two outstanding design fixes** while rebuilding (see section
-   2): cut/merge the redundant three-card section, and fix the nav logo
-   sizing.
+6. **Right after launch: logo and fonts.** The three-card section is already
+   removed. What's left is fixing the nav logo (the circular badge described
+   in Section 1, and footer contrast) and loading Aref Ruqaa for the Urdu
+   wordmark.
 
 ## 4. Explicitly out of scope for now
 
