@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Guftagoo"
+description = "A warm, human landing page inviting experienced Pakistani professionals to join Guftagoo's founding mentor cohort and help others enter their field."
+version = "1.0.0"
+id = "artifacts/guftagoo"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18929
+
+[services.development]
+run = "pnpm --filter @workspace/guftagoo run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/guftagoo", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/guftagoo/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18929"
+BASE_PATH = "/"

@@ -1,0 +1,163 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: mentor-signups
+    description: Mentor signup operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /mentor-signups:
+    post:
+      operationId: createMentorSignup
+      tags: [mentor-signups]
+      summary: Save a mentor signup
+      description: Stores a prospective mentor's details and preferred ways to help
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MentorSignupInput"
+      responses:
+        "201":
+          description: Mentor signup saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MentorSignup"
+        "400":
+          description: Invalid mentor signup
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    MentorSignup:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        field:
+          type: string
+          enum:
+            - Technology & engineering
+            - Product & design
+            - Finance & consulting
+            - Medicine & healthcare
+            - Law & policy
+            - Marketing & communications
+            - Education & research
+            - Other
+        yearsExperience:
+          type: string
+          enum:
+            - 0–2 years
+            - 3–5 years
+            - 6–10 years
+            - 10+ years
+        helpOptions:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+            enum:
+              - Referrals
+              - Career advice
+              - Mock interviews
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - email
+        - field
+        - yearsExperience
+        - helpOptions
+        - createdAt
+    MentorSignupInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        email:
+          type: string
+          format: email
+        field:
+          type: string
+          enum:
+            - Technology & engineering
+            - Product & design
+            - Finance & consulting
+            - Medicine & healthcare
+            - Law & policy
+            - Marketing & communications
+            - Education & research
+            - Other
+        yearsExperience:
+          type: string
+          enum:
+            - 0–2 years
+            - 3–5 years
+            - 6–10 years
+            - 10+ years
+        helpOptions:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+            enum:
+              - Referrals
+              - Career advice
+              - Mock interviews
+      required:
+        - name
+        - email
+        - field
+        - yearsExperience
+        - helpOptions
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
