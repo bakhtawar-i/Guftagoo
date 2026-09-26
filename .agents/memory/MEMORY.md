@@ -1,1 +1,0 @@
-- [Generated API client typings](generated-api-client-typings.md) — mutation generation may require iterable DOM typings in the React client package.
