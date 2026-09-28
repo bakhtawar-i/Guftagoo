@@ -1,12 +1,19 @@
 import { type FormEvent, type ReactNode, useEffect, useRef, useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import { ArrowDown, ArrowUpRight, Check, ChevronRight, HandHeart, Menu, X } from 'lucide-react';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { submitMentorSignup } from '@/mentor-signup-form';
+import { supabase } from '@/lib/supabase';
+import {
+  MENTOR_EXPERIENCE_RANGES,
+  MENTOR_FIELDS,
+  MENTOR_HELP_OPTIONS,
+  saveMentorSignup,
+  submitMentorSignup,
+  type MentorSignupInput,
+} from '@/mentor-signup-form';
 import NotFound from '@/pages/not-found';
-import { useCreateMentorSignup, type MentorSignupInput } from '@workspace/api-client-react';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
 const queryClient = new QueryClient();
@@ -42,8 +49,6 @@ function Wordmark({ compact = false }: { compact?: boolean }) {
   );
 }
 
-const MENTOR_HELP_OPTIONS: MentorSignupInput['helpOptions'] = ['Referrals', 'Career advice', 'Mock interviews'];
-
 function SignupModal({ onClose }: { onClose: () => void }) {
   const [submitted, setSubmitted] = useState(false);
   const [name, setName] = useState('');
@@ -52,7 +57,9 @@ function SignupModal({ onClose }: { onClose: () => void }) {
   const [yearsExperience, setYearsExperience] = useState<MentorSignupInput['yearsExperience'] | ''>('');
   const [helpOptions, setHelpOptions] = useState<MentorSignupInput['helpOptions']>([]);
   const [error, setError] = useState('');
-  const signupMutation = useCreateMentorSignup();
+  const signupMutation = useMutation({
+    mutationFn: ({ data }: { data: MentorSignupInput }) => saveMentorSignup(supabase, data),
+  });
 
   function submit(event: FormEvent<HTMLFormElement>) {
     submitMentorSignup({
@@ -94,24 +101,14 @@ function SignupModal({ onClose }: { onClose: () => void }) {
                 <span className="mb-2 block font-mono text-[10px] font-bold uppercase tracking-[.16em] text-[#52536a]">Your field</span>
                 <select required value={field} onChange={(event) => setField(event.target.value as MentorSignupInput['field'])} className="focus-ring w-full appearance-none rounded-xl border border-[#d9d5ca] bg-[#fffdf8] px-4 py-3.5 text-[#1c214a] outline-none transition focus:border-[#1d9fb6]" data-testid="select-mentor-field">
                   <option value="" disabled>Choose your field</option>
-                  <option>Technology & engineering</option>
-                  <option>Product & design</option>
-                  <option>Finance & consulting</option>
-                  <option>Medicine & healthcare</option>
-                  <option>Law & policy</option>
-                  <option>Marketing & communications</option>
-                  <option>Education & research</option>
-                  <option>Other</option>
+                  {MENTOR_FIELDS.map((option) => <option key={option}>{option}</option>)}
                 </select>
               </label>
               <label className="block">
                 <span className="mb-2 block font-mono text-[10px] font-bold uppercase tracking-[.16em] text-[#52536a]">Years of experience</span>
                 <select required value={yearsExperience} onChange={(event) => setYearsExperience(event.target.value as MentorSignupInput['yearsExperience'])} className="focus-ring w-full appearance-none rounded-xl border border-[#d9d5ca] bg-[#fffdf8] px-4 py-3.5 text-[#1c214a] outline-none transition focus:border-[#1d9fb6]" data-testid="select-mentor-experience">
                   <option value="" disabled>Choose a range</option>
-                  <option>0–2 years</option>
-                  <option>3–5 years</option>
-                  <option>6–10 years</option>
-                  <option>10+ years</option>
+                  {MENTOR_EXPERIENCE_RANGES.map((option) => <option key={option}>{option}</option>)}
                 </select>
               </label>
               <fieldset className="block">

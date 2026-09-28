@@ -3,9 +3,10 @@ import { test } from 'node:test';
 import {
   MISSING_SIGNUP_DETAILS_ERROR,
   SAVE_SIGNUP_ERROR,
+  saveMentorSignup,
   submitMentorSignup,
+  type MentorSignupInput,
 } from './mentor-signup-form';
-import type { MentorSignupInput } from '@workspace/api-client-react';
 
 const validValues: MentorSignupInput = {
   name: 'Test Mentor',
@@ -88,4 +89,43 @@ test('shows a validation error without sending incomplete signup details', () =>
   assert.equal(mutationCalled, false);
   assert.equal(submitted, false);
   assert.equal(error, MISSING_SIGNUP_DETAILS_ERROR);
+});
+function createFakeClient(result: { error: unknown }) {
+  const calls: { table: string; row: Record<string, unknown> }[] = [];
+  return {
+    calls,
+    client: {
+      from: (table: 'mentor_signups') => ({
+        insert: async (row: Record<string, unknown>) => {
+          calls.push({ table, row });
+          return result;
+        },
+      }),
+    },
+  };
+}
+
+test('saves the signup to the mentor_signups table using its column names', async () => {
+  const fake = createFakeClient({ error: null });
+
+  await saveMentorSignup(fake.client, { ...validValues, name: '  Test Mentor ', email: ' test-mentor@example.com ' });
+
+  assert.deepEqual(fake.calls, [
+    {
+      table: 'mentor_signups',
+      row: {
+        name: 'Test Mentor',
+        email: 'test-mentor@example.com',
+        field: 'Technology & engineering',
+        years_experience: '6–10 years',
+        help_options: ['Referrals'],
+      },
+    },
+  ]);
+});
+
+test('fails when the database rejects the signup', async () => {
+  const fake = createFakeClient({ error: { message: 'new row violates check constraint' } });
+
+  await assert.rejects(saveMentorSignup(fake.client, validValues));
 });
