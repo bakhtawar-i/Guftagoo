@@ -42,11 +42,10 @@ function Reveal({ children, className = '', delay }: RevealProps) {
 
 function Wordmark({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
   return (
-    <a href="#top" className="focus-ring inline-flex items-center gap-3" aria-label="Guftagoo, back to top" data-testid="link-wordmark">
-      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#27b0c7]" aria-hidden="true">
-        <span lang="ur" dir="rtl" className="font-urdu text-[19px] font-bold leading-none text-[#1c214a] translate-y-[2px]">گفتگو</span>
-      </span>
-      <span className={`font-mono text-[11px] font-bold tracking-[.22em] ${tone === 'light' ? 'text-[#f9f5eb]' : 'text-[#1c214a]'}`}>GUFTAGOO</span>
+    <a href="#top" className={`focus-ring inline-flex items-center gap-3 ${tone === 'light' ? 'text-[#f9f5eb]' : 'text-[#1c214a]'}`} aria-label="Guftagoo, back to top" data-testid="link-wordmark">
+      <span lang="ur" dir="rtl" className="font-urdu translate-y-[4px] text-[30px] font-bold leading-none" data-testid="wordmark-urdu">گفتگو</span>
+      <span className="h-6 w-px bg-[#1d9fb6]" aria-hidden="true" data-testid="wordmark-divider" />
+      <span className="font-mono text-[12px] font-bold tracking-[.22em]" data-testid="wordmark-latin">GUFTAGOO</span>
     </a>
   );
 }

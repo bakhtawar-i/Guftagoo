@@ -51,12 +51,11 @@ rest of the platform are future work, out of scope here.
 
   Avoid introducing new colors outside this set.
 - **Logo:** the word "گفتگو" (Guftagoo) set in the Aref Ruqaa Urdu typeface,
-  paired with "GUFTAGOO" in Latin small caps. In the nav, this appears as a
-  circular badge — cyan circle background with the navy Urdu wordmark inside
-  — sized large enough to actually be legible (at least ~44–48px), not a
-  tiny illegible smudge. ✅ Done: a 48px cyan (`#27b0c7`) circle with the
-  navy wordmark set in Aref Ruqaa, next to "GUFTAGOO" (navy in the header,
-  cream in the navy footer). The hero card still shows the original PNG.
+  then a thin cyan (`#1d9fb6`) vertical divider, then "GUFTAGOO" in Latin
+  small caps (Space Mono): `گفتگو | GUFTAGOO`. No badge or circle. Navy on
+  light backgrounds, cream on navy (footer). The Urdu is nudged down 4px so
+  its ink lines up optically with the divider and the Latin text. The hero
+  card still shows the original PNG.
 - **Fonts:** Instrument Serif (headlines), DM Sans (body text), Space Mono
   (small uppercase labels), Aref Ruqaa (the Urdu wordmark, via the
   `font-urdu` class). All load from Google Fonts in `src/index.css`.
@@ -118,7 +117,7 @@ Replit. The page, top to bottom:
 - **Nav logo sizing** — ✅ **fixed after the Vercel launch.** The nav and
   footer used to show the whole square logo image at 64px, which made the
   Urdu text tiny, and the footer's "GUFTAGOO" was navy on navy. Both now use
-  the circular Aref Ruqaa badge described in Section 1.
+  the `گفتگو | GUFTAGOO` wordmark described in Section 1.
 - **Backend (current state)** — a separate Express API server
   (`artifacts/api-server`) with one endpoint, `POST /api/mentor-signups`,
   which validates the form and saves it to a Postgres database through
@@ -155,8 +154,8 @@ Move the project off Replit entirely and onto a self-owned stack:
    (Vercel's Root Directory must stay at the repo root); the two
    `VITE_SUPABASE_*` variables are set in Vercel. Every merge to `main`
    redeploys automatically.
-6. ✅ **Logo and fonts** — done. Circular nav badge with the Aref Ruqaa
-   wordmark, readable footer logo, unused Inter font removed.
+6. ✅ **Logo and fonts** — done. `گفتگو | GUFTAGOO` wordmark in Aref Ruqaa
+   in the nav and footer, unused Inter font removed.
 
 ## 4. Explicitly out of scope for now
 
