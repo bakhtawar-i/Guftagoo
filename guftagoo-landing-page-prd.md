@@ -138,20 +138,21 @@ The project code was exported from Replit and is now on GitHub.
 
 Move the project off Replit entirely and onto a self-owned stack:
 
-1. **Set up the project in Cursor** using the exported code as the base.
-   Audit it for anything tied specifically to Replit's managed database or
-   environment (e.g. `DATABASE_URL` references, Replit-specific config) —
-   this logic needs to be replaced, not just copied over.
-2. ~~**Initialize Git and push to GitHub**~~ — ✅ done; the project is on
-   GitHub.
-3. **Stand up a Supabase project** to replace Replit's database:
-   - Recreate the mentor-signup table with fields: name, email, field/
-     industry, years of experience, how they'd like to help (multi-select).
-   - Rebuild the form-submission logic against Supabase's client library
-     instead of whatever Replit's managed Postgres integration was doing.
-4. **Environment variables** — store the Supabase URL and API key as env
-   vars (not committed to Git). Add `.env` to `.gitignore` before the first
-   commit if not already present.
+1. ✅ **Remove Replit-specific setup** — done. Replit config, plugins and
+   the Postgres/`DATABASE_URL` code are gone; the site runs with a plain
+   `pnpm dev` (see `README.md`).
+2. ✅ **Git and GitHub** — done; the project is on GitHub.
+3. ✅ **Supabase replaces Replit's database** — done. The
+   `mentor_signups` table (id, created_at, name, email, field,
+   years_experience, help_options) has `check` constraints that reject
+   invalid values, and row-level security lets website visitors *insert*
+   only — never read, edit or delete. The form saves directly from the
+   browser with `@supabase/supabase-js`; the separate Express API server
+   (the "middleman") was removed. Signups are reviewed in the Supabase
+   dashboard's Table Editor.
+4. ✅ **Environment variables** — done. `VITE_SUPABASE_URL` and
+   `VITE_SUPABASE_PUBLISHABLE_KEY` live in `artifacts/guftagoo/.env`, which
+   is git-ignored; `.env.example` is the committed template.
 5. **Deploy via Vercel** — connect the GitHub repo, add the same Supabase
    environment variables in Vercel's project settings, and deploy to get a
    production URL.
