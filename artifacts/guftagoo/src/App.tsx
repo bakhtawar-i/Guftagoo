@@ -40,11 +40,13 @@ function Reveal({ children, className = '', delay }: RevealProps) {
   return <div ref={ref} className={`reveal ${visible ? 'is-visible' : ''} ${delay ? `reveal-delay-${delay}` : ''} ${className}`}>{children}</div>;
 }
 
-function Wordmark({ compact = false }: { compact?: boolean }) {
+function Wordmark({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
   return (
-    <a href="#top" className="focus-ring inline-flex items-center gap-3" data-testid="link-wordmark">
-      <img src="/guftagoo-mark.png" alt="Guftagoo Urdu wordmark" className={`${compact ? 'h-16 w-16' : 'h-16 w-16'} object-contain`} />
-      <span className="font-mono text-[11px] font-bold tracking-[.22em] text-[#1c214a]">GUFTAGOO</span>
+    <a href="#top" className="focus-ring inline-flex items-center gap-3" aria-label="Guftagoo, back to top" data-testid="link-wordmark">
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#27b0c7]" aria-hidden="true">
+        <span lang="ur" dir="rtl" className="font-urdu text-[19px] font-bold leading-none text-[#1c214a] translate-y-[2px]">گفتگو</span>
+      </span>
+      <span className={`font-mono text-[11px] font-bold tracking-[.22em] ${tone === 'light' ? 'text-[#f9f5eb]' : 'text-[#1c214a]'}`}>GUFTAGOO</span>
     </a>
   );
 }
@@ -161,7 +163,7 @@ function Home() {
     <main id="top" className="grain overflow-hidden bg-[#f9f5eb] text-[#1c214a]">
       <header className="absolute left-0 right-0 top-0 z-30">
         <div className="mx-auto flex max-w-[1240px] items-center justify-between px-6 py-5 lg:px-10 lg:py-7">
-          <Wordmark compact />
+          <Wordmark />
           <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation">
             <a href="#why" className="focus-ring text-sm text-[#52536a] transition hover:text-[#1c214a]" data-testid="link-nav-why">Why Guftagoo</a>
             <a href="#how" className="focus-ring text-sm text-[#52536a] transition hover:text-[#1c214a]" data-testid="link-nav-how">How it works</a>
@@ -277,7 +279,7 @@ function Home() {
 
       <footer className="bg-[#1c214a] px-6 py-12 text-[#f9f5eb] lg:px-10">
         <div className="mx-auto flex max-w-[1240px] flex-col justify-between gap-10 sm:flex-row sm:items-end">
-          <div><Wordmark compact /><p className="mt-5 max-w-[250px] text-sm leading-6 text-[#b4b5c7]">Conversations that make room for what’s next.</p></div>
+          <div><Wordmark tone="light" /><p className="mt-5 max-w-[250px] text-sm leading-6 text-[#b4b5c7]">Conversations that make room for what’s next.</p></div>
           <div className="flex flex-col gap-3 sm:items-end"><a href="#top" className="focus-ring inline-flex items-center gap-2 text-sm text-[#b4b5c7] transition hover:text-[#f9f5eb]" data-testid="link-back-top">Back to top <ChevronRight size={16} className="-rotate-90" /></a><span className="font-mono text-[10px] uppercase tracking-[.17em] text-[#777b9a]">Made for Pakistanis, everywhere</span></div>
         </div>
       </footer>
