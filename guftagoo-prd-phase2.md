@@ -130,6 +130,8 @@ LinkedIn; they happen through people willing to make space for someone else.
 - **No domain yet.** Email (build-order steps 5, 6, 9) waits until one is
   bought. Steps 1–4 don't need email.
 - **Mentee CTA wording:** "Find a mentor".
+- **Same-stage matching (2026-09-30):** allowed for every band except
+  Student/entry — see 2.5.
 
 ## 2. Phase 2 — build this now
 
@@ -211,9 +213,14 @@ submission or treat this as an error state.
   mentee checked the adjacent-field box, mentors in that second field are
   also eligible. No fuzzy/semantic field matching — exact string match
   against the fixed taxonomy only.
-- **Seniority gap:** the mentor's band must be strictly higher than the
-  mentee's band (no same-band matching). No upper limit — a Student/entry
-  mentee can be matched with a Senior mentor.
+- **Seniority gap:** the mentor's band must be the same as or higher than
+  the mentee's band, except at Student/entry: a Student/entry mentee is only
+  matched with a more senior mentor (no student-to-student matches). No
+  upper limit — a Student/entry mentee can be matched with a Senior mentor.
+  In practice, Student/entry mentors can't be matched with anyone. The rule
+  lives in the database function `seniority_compatible` (decision
+  2026-09-30; this replaces the original "strictly higher" rule, which left
+  Senior mentees unmatchable).
 - **Need/offer overlap:** the mentee's single selected need must be present
   in the mentor's multi-select offers list.
 - **Capacity:** every mentor is capped at **2 open/active intro requests at
