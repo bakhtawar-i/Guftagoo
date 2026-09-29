@@ -1,18 +1,11 @@
-import { type FormEvent, type ReactNode, useEffect, useRef, useState } from 'react';
-import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
-import { ArrowDown, ArrowUpRight, Check, ChevronRight, HandHeart, Menu, X } from 'lucide-react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ArrowUpRight, ChevronRight, HandHeart, Menu, X } from 'lucide-react';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { supabase } from '@/lib/supabase';
-import {
-  MENTOR_EXPERIENCE_RANGES,
-  MENTOR_FIELDS,
-  MENTOR_HELP_OPTIONS,
-  saveMentorSignup,
-  submitMentorSignup,
-  type MentorSignupInput,
-} from '@/mentor-signup-form';
+import { MenteeSignupDialog } from '@/components/signup/mentee-signup-dialog';
+import { MentorSignupDialog } from '@/components/signup/mentor-signup-dialog';
 import NotFound from '@/pages/not-found';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
@@ -50,111 +43,12 @@ function Wordmark({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
   );
 }
 
-function SignupModal({ onClose }: { onClose: () => void }) {
-  const [submitted, setSubmitted] = useState(false);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [field, setField] = useState<MentorSignupInput['field'] | ''>('');
-  const [yearsExperience, setYearsExperience] = useState<MentorSignupInput['yearsExperience'] | ''>('');
-  const [helpOptions, setHelpOptions] = useState<MentorSignupInput['helpOptions']>([]);
-  const [error, setError] = useState('');
-  const signupMutation = useMutation({
-    mutationFn: ({ data }: { data: MentorSignupInput }) => saveMentorSignup(supabase, data),
-  });
-
-  function submit(event: FormEvent<HTMLFormElement>) {
-    submitMentorSignup({
-      event,
-      values: {
-        name,
-        email,
-        field,
-        yearsExperience,
-        helpOptions,
-      },
-      mutation: signupMutation,
-      setError,
-      setSubmitted,
-    });
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1c214a]/55 px-4 py-6 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="signup-title">
-      <div className="relative w-full max-w-[540px] overflow-hidden rounded-[28px] bg-[#f9f5eb] p-7 shadow-2xl sm:p-10">
-        <button onClick={onClose} className="focus-ring absolute right-5 top-5 rounded-full p-2 text-[#1c214a]/60 transition hover:bg-[#1c214a]/8 hover:text-[#1c214a]" aria-label="Close signup" data-testid="button-close-signup"><X size={20} /></button>
-        {!submitted ? (
-          <>
-            <div className="mb-8 max-w-sm">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-[.2em] text-[#1d9fb6]">A small first step</span>
-              <h2 id="signup-title" className="mt-3 font-serif text-[42px] leading-[.95] text-[#1c214a]">Bring what you know.</h2>
-              <p className="mt-4 text-[15px] leading-6 text-[#52536a]">Tell us a little about yourself. We’ll be in touch when we’re ready to make a thoughtful match.</p>
-            </div>
-            <form onSubmit={submit} className="space-y-4">
-              <label className="block">
-                <span className="mb-2 block font-mono text-[10px] font-bold uppercase tracking-[.16em] text-[#52536a]">Your name</span>
-                <input required value={name} onChange={(event) => setName(event.target.value)} className="focus-ring w-full rounded-xl border border-[#d9d5ca] bg-[#fffdf8] px-4 py-3.5 text-[#1c214a] outline-none transition placeholder:text-[#a5a0a0] focus:border-[#1d9fb6]" placeholder="What should we call you?" data-testid="input-mentor-name" />
-              </label>
-              <label className="block">
-                <span className="mb-2 block font-mono text-[10px] font-bold uppercase tracking-[.16em] text-[#52536a]">Email address</span>
-                <input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="focus-ring w-full rounded-xl border border-[#d9d5ca] bg-[#fffdf8] px-4 py-3.5 text-[#1c214a] outline-none transition placeholder:text-[#a5a0a0] focus:border-[#1d9fb6]" placeholder="you@example.com" data-testid="input-mentor-email" />
-              </label>
-              <label className="block">
-                <span className="mb-2 block font-mono text-[10px] font-bold uppercase tracking-[.16em] text-[#52536a]">Your field</span>
-                <select required value={field} onChange={(event) => setField(event.target.value as MentorSignupInput['field'])} className="focus-ring w-full appearance-none rounded-xl border border-[#d9d5ca] bg-[#fffdf8] px-4 py-3.5 text-[#1c214a] outline-none transition focus:border-[#1d9fb6]" data-testid="select-mentor-field">
-                  <option value="" disabled>Choose your field</option>
-                  {MENTOR_FIELDS.map((option) => <option key={option}>{option}</option>)}
-                </select>
-              </label>
-              <label className="block">
-                <span className="mb-2 block font-mono text-[10px] font-bold uppercase tracking-[.16em] text-[#52536a]">Years of experience</span>
-                <select required value={yearsExperience} onChange={(event) => setYearsExperience(event.target.value as MentorSignupInput['yearsExperience'])} className="focus-ring w-full appearance-none rounded-xl border border-[#d9d5ca] bg-[#fffdf8] px-4 py-3.5 text-[#1c214a] outline-none transition focus:border-[#1d9fb6]" data-testid="select-mentor-experience">
-                  <option value="" disabled>Choose a range</option>
-                  {MENTOR_EXPERIENCE_RANGES.map((option) => <option key={option}>{option}</option>)}
-                </select>
-              </label>
-              <fieldset className="block">
-                <legend className="mb-2 block font-mono text-[10px] font-bold uppercase tracking-[.16em] text-[#52536a]">How would you like to help?</legend>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  {MENTOR_HELP_OPTIONS.map((option) => (
-                    <label key={option} className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-[#d9d5ca] bg-[#fffdf8] px-3.5 py-3 text-sm text-[#1c214a] transition hover:border-[#1d9fb6] has-[:checked]:border-[#1d9fb6] has-[:checked]:bg-[#e7f5f2]">
-                      <input
-                        type="checkbox"
-                        name="help"
-                        value={option}
-                        checked={helpOptions.includes(option)}
-                        onChange={(event) => setHelpOptions((current) => event.target.checked ? [...current, option] : current.filter((item) => item !== option))}
-                        className="h-4 w-4 accent-[#1d9fb6]"
-                        data-testid={`checkbox-help-${option.toLowerCase().replace(' ', '-')}`}
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-              {error && <p className="rounded-xl border border-[#c86a62]/35 bg-[#fff0ec] px-4 py-3 text-sm leading-5 text-[#9d4038]" role="alert" data-testid="text-signup-error">{error}</p>}
-              <button type="submit" disabled={signupMutation.isPending} className="focus-ring mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-[#1c214a] px-5 py-4 font-semibold text-[#f9f5eb] transition hover:-translate-y-0.5 hover:bg-[#252b60] disabled:cursor-wait disabled:opacity-60" data-testid="button-submit-signup">{signupMutation.isPending ? 'Saving your place…' : 'Join the mentor list'} {!signupMutation.isPending && <ArrowUpRight size={17} />}</button>
-            </form>
-            <p className="mt-5 text-center text-xs leading-5 text-[#777487]">No sales pitch. Just a real conversation when the time is right.</p>
-          </>
-        ) : (
-          <div className="py-10 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#bfe9e7] text-[#1c214a]"><Check size={28} strokeWidth={2.5} /></div>
-            <h2 className="mt-7 font-serif text-[44px] leading-none text-[#1c214a]">You’re on the list.</h2>
-            <p className="mx-auto mt-4 max-w-sm text-[15px] leading-6 text-[#52536a]">Thank you, {name || 'friend'}. The best conversations start with showing up.</p>
-            <button onClick={onClose} className="focus-ring mt-8 rounded-full border border-[#1c214a] px-6 py-3 text-sm font-semibold text-[#1c214a] transition hover:bg-[#1c214a] hover:text-[#f9f5eb]" data-testid="button-finish-signup">Back to Guftagoo</button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [signupOpen, setSignupOpen] = useState(false);
+  const [signup, setSignup] = useState<'mentor' | 'mentee' | null>(null);
 
-  function openSignup() {
-    setSignupOpen(true);
+  function openSignup(kind: 'mentor' | 'mentee') {
+    setSignup(kind);
     setMenuOpen(false);
   }
 
@@ -166,7 +60,10 @@ function Home() {
           <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation">
             <a href="#why" className="focus-ring text-sm text-[#52536a] transition hover:text-[#1c214a]" data-testid="link-nav-why">Why Guftagoo</a>
             <a href="#how" className="focus-ring text-sm text-[#52536a] transition hover:text-[#1c214a]" data-testid="link-nav-how">How it works</a>
-            <button onClick={openSignup} className="focus-ring rounded-full bg-[#1c214a] px-5 py-2.5 text-sm font-semibold text-[#f9f5eb] transition hover:-translate-y-0.5 hover:bg-[#252b60]" data-testid="button-nav-signup">Sign up as a Mentor <ArrowUpRight className="ml-1 inline" size={15} /></button>
+            <div className="flex items-center gap-3">
+              <button onClick={() => openSignup('mentee')} className="focus-ring rounded-full border border-[#1c214a] px-5 py-2.5 text-sm font-semibold text-[#1c214a] transition hover:-translate-y-0.5 hover:bg-[#1c214a] hover:text-[#f9f5eb]" data-testid="button-nav-find-mentor">Find a mentor</button>
+              <button onClick={() => openSignup('mentor')} className="focus-ring rounded-full bg-[#1c214a] px-5 py-2.5 text-sm font-semibold text-[#f9f5eb] transition hover:-translate-y-0.5 hover:bg-[#252b60]" data-testid="button-nav-signup">Sign up as a Mentor <ArrowUpRight className="ml-1 inline" size={15} /></button>
+            </div>
           </nav>
           <button onClick={() => setMenuOpen(!menuOpen)} className="focus-ring rounded-full p-2 md:hidden" aria-label={menuOpen ? 'Close menu' : 'Open menu'} data-testid="button-mobile-menu">{menuOpen ? <X size={23} /> : <Menu size={23} />}</button>
         </div>
@@ -174,7 +71,8 @@ function Home() {
           <div className="mx-4 rounded-2xl border border-[#d9d5ca] bg-[#fffdf8] p-3 shadow-lg md:hidden">
             <a href="#why" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-sm text-[#52536a] hover:bg-[#f1ede3]" data-testid="link-mobile-why">Why Guftagoo</a>
             <a href="#how" onClick={() => setMenuOpen(false)} className="block rounded-xl px-4 py-3 text-sm text-[#52536a] hover:bg-[#f1ede3]" data-testid="link-mobile-how">How it works</a>
-            <button onClick={openSignup} className="mt-1 w-full rounded-xl bg-[#1c214a] px-4 py-3 text-left text-sm font-semibold text-[#f9f5eb]" data-testid="button-mobile-signup">Sign up as a Mentor <ArrowUpRight className="ml-1 inline" size={15} /></button>
+            <button onClick={() => openSignup('mentor')} className="mt-1 w-full rounded-xl bg-[#1c214a] px-4 py-3 text-left text-sm font-semibold text-[#f9f5eb]" data-testid="button-mobile-signup">Sign up as a Mentor <ArrowUpRight className="ml-1 inline" size={15} /></button>
+            <button onClick={() => openSignup('mentee')} className="mt-2 w-full rounded-xl border border-[#1c214a] px-4 py-3 text-left text-sm font-semibold text-[#1c214a]" data-testid="button-mobile-find-mentor">Find a mentor</button>
           </div>
         )}
       </header>
@@ -194,10 +92,10 @@ function Home() {
               Guftagoo connects experienced Pakistanis with people finding their way into the careers they’ve been dreaming about.
             </p>
             <div className="animate-rise mt-9 flex flex-wrap items-center gap-5 [animation-delay:340ms]">
-              <button onClick={openSignup} className="focus-ring group inline-flex items-center gap-3 rounded-full bg-[#1c214a] px-6 py-4 text-[15px] font-semibold text-[#f9f5eb] shadow-[0_12px_30px_rgba(28,33,74,.15)] transition hover:-translate-y-1 hover:bg-[#252b60]" data-testid="button-hero-signup">
+              <button onClick={() => openSignup('mentor')} className="focus-ring group inline-flex items-center gap-3 rounded-full bg-[#1c214a] px-6 py-4 text-[15px] font-semibold text-[#f9f5eb] shadow-[0_12px_30px_rgba(28,33,74,.15)] transition hover:-translate-y-1 hover:bg-[#252b60]" data-testid="button-hero-signup">
                 Sign up as a Mentor <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f5ba52] text-[#1c214a] transition group-hover:rotate-45"><ArrowUpRight size={15} /></span>
               </button>
-              <a href="#how" className="focus-ring inline-flex items-center gap-2 text-sm font-semibold text-[#1c214a] transition hover:gap-3" data-testid="link-hero-how">See how it works <ArrowDown size={16} /></a>
+              <button onClick={() => openSignup('mentee')} className="focus-ring inline-flex items-center gap-2 rounded-full border border-[#1c214a] px-6 py-4 text-[15px] font-semibold text-[#1c214a] transition hover:-translate-y-1 hover:bg-[#1c214a] hover:text-[#f9f5eb]" data-testid="button-hero-find-mentor">Find a mentor</button>
             </div>
           </div>
           <div className="relative flex min-h-[340px] items-center justify-center lg:min-h-[500px]">
@@ -256,7 +154,7 @@ function Home() {
             ))}
           </div>
           <Reveal className="mt-16">
-            <button onClick={openSignup} className="focus-ring group inline-flex items-center gap-3 rounded-full bg-[#1c214a] px-6 py-4 text-[15px] font-semibold text-[#f9f5eb] transition hover:-translate-y-1 hover:bg-[#252b60]" data-testid="button-how-signup">Sign up as a Mentor <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f5ba52] transition group-hover:rotate-45"><ArrowUpRight size={15} /></span></button>
+            <button onClick={() => openSignup('mentor')} className="focus-ring group inline-flex items-center gap-3 rounded-full bg-[#1c214a] px-6 py-4 text-[15px] font-semibold text-[#f9f5eb] transition hover:-translate-y-1 hover:bg-[#252b60]" data-testid="button-how-signup">Sign up as a Mentor <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f5ba52] transition group-hover:rotate-45"><ArrowUpRight size={15} /></span></button>
           </Reveal>
         </div>
       </section>
@@ -271,7 +169,7 @@ function Home() {
           </Reveal>
           <Reveal delay={1} className="max-w-[340px]">
             <p className="text-[17px] leading-7 text-[#1c214a]/75">The best thing you can give someone at the beginning is proof that they belong in the room.</p>
-            <button onClick={openSignup} className="focus-ring mt-7 inline-flex items-center gap-3 rounded-full bg-[#1c214a] px-6 py-4 text-[15px] font-semibold text-[#f9f5eb] transition hover:-translate-y-1 hover:bg-[#252b60]" data-testid="button-closing-signup">Sign up as a Mentor <ArrowUpRight size={17} /></button>
+            <button onClick={() => openSignup('mentor')} className="focus-ring mt-7 inline-flex items-center gap-3 rounded-full bg-[#1c214a] px-6 py-4 text-[15px] font-semibold text-[#f9f5eb] transition hover:-translate-y-1 hover:bg-[#252b60]" data-testid="button-closing-signup">Sign up as a Mentor <ArrowUpRight size={17} /></button>
           </Reveal>
         </div>
       </section>
@@ -283,7 +181,8 @@ function Home() {
         </div>
       </footer>
 
-      {signupOpen && <SignupModal onClose={() => setSignupOpen(false)} />}
+      {signup === 'mentor' && <MentorSignupDialog onClose={() => setSignup(null)} />}
+      {signup === 'mentee' && <MenteeSignupDialog onClose={() => setSignup(null)} />}
     </main>
   );
 }

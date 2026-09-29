@@ -113,9 +113,23 @@ LinkedIn; they happen through people willing to make space for someone else.
   SPF/DKIM/DMARC) and a provider such as Resend.
 - **Server-side code doesn't exist** — Phase 2 needs it for sending email,
   the cold-start check, accept/decline pages and the scheduled matching
-  job. Plan: Vercel Functions in this repo plus a scheduled job, with the
-  Supabase secret key stored only in Vercel. Note Vercel's free (Hobby)
-  plan limits scheduled jobs to once a day.
+  job. Vercel's free (Hobby) plan limits scheduled jobs to once a day, so
+  scheduling runs in Supabase instead (see "Decisions" below).
+
+### Decisions made while starting Phase 2 (2026-09-29)
+
+- **Needs/offers reduced to four:** Referral · Career advice · Mock
+  interview · CV review. "Mentorship" and "Coffee chat" are dropped.
+  Section 2.1 is updated to match.
+- **Fields:** the 2.1 list stands as written. Software/Tech and Engineering
+  (non-software) stay separate, and so do Finance and Consulting.
+- **No existing signups** to migrate. The Phase 1 `mentor_signups` table is
+  replaced by a fresh `mentors` table.
+- **Scheduling runs in Supabase** (`pg_cron`), not Vercel Cron: Vercel is on
+  the free Hobby plan, which limits scheduled jobs to once a day.
+- **No domain yet.** Email (build-order steps 5, 6, 9) waits until one is
+  bought. Steps 1–4 don't need email.
+- **Mentee CTA wording:** "Find a mentor".
 
 ## 2. Phase 2 — build this now
 
@@ -132,10 +146,10 @@ Engineering (non-software) · Marketing/Sales · Academia/Research · Design ·
 Other
 
 **Mentee need (single-select, mentee form only):**
-Referral · Mentorship · Coffee chat · Mock interview · CV review
+Referral · Career advice · Mock interview · CV review
 
 **Mentor offers (multi-select, mentor form only):**
-Same five options as mentee need, so the matcher can check direct overlap.
+Same four options as mentee need, so the matcher can check direct overlap.
 
 **Seniority bands (single-select on both forms), always displayed with the
 year range in parentheses so there's no ambiguity:**
@@ -309,11 +323,14 @@ any of the above templates can reliably send.
 
 ### 2.10 Build order for this phase
 
-1. Confirm/add LinkedIn URL field on the mentor form; add consent checkbox.
-2. Build the mentee form (all fields from 2.4), with the adjacent-field
+1. ✅ Confirm/add LinkedIn URL field on the mentor form; add consent checkbox.
+2. ✅ Build the mentee form (all fields from 2.4), with the adjacent-field
    prompt and cold-start messaging.
-3. Add the mentee entry point to the landing page (2.3).
-4. Data model migrations for the additions in 2.9.
+3. ✅ Add the mentee entry point to the landing page (2.3).
+4. ✅ Data model migrations for the additions in 2.9
+   (`supabase/migrations/`). `active_request_count` is computed from
+   `intro_requests` rather than stored. The cold-start check is a database
+   function, `mentee_match_available`, that returns only true/false.
 5. Confirm/stand up transactional email infrastructure if not already
    solid from Phase 1.
 6. Build all templates from 2.8.

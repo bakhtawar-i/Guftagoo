@@ -31,14 +31,21 @@ You need [Node.js](https://nodejs.org) 22 or newer and
 
 ## Where things live
 
-- `artifacts/guftagoo/src/App.tsx` — the whole landing page and signup form
-- `artifacts/guftagoo/src/mentor-signup-form.ts` — form options, validation
-  and saving to Supabase (the option lists must match the database's
-  `check` constraints)
+- `artifacts/guftagoo/src/App.tsx` — the landing page
+- `artifacts/guftagoo/src/components/signup/` — the mentor and mentee signup
+  forms
+- `artifacts/guftagoo/src/signup/taxonomy.ts` — the field, career-stage and
+  need options (must match the database's `check` constraints)
+- `artifacts/guftagoo/src/signup/mentor.ts`, `mentee.ts` — form checks and
+  saving to Supabase
 - `artifacts/guftagoo/src/lib/supabase.ts` — Supabase connection
 - `artifacts/guftagoo/src/index.css` — theme and animations
+- `supabase/migrations/` — the SQL that sets up the database, run in order in
+  Supabase → SQL Editor
 
 ## Viewing signups
 
-Open your Supabase project → **Table Editor** → `mentor_signups`. The
-website can only add rows; it cannot read them.
+Open your Supabase project → **Table Editor** → `mentors` or `mentees`. The
+website can only add rows; it cannot read them. To verify a mentor, change
+their `status` from `pending` to `verified` — only verified mentors can be
+matched.
