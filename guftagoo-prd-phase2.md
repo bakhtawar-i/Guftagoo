@@ -16,6 +16,8 @@
 
 ## 1. Phase 1 — completed
 
+*Verified against the codebase on 2026-09-29.*
+
 Guftagoo (Urdu for "conversation") is a Pakistani professional referral and
 mentorship platform. It connects experienced Pakistani professionals with
 people trying to break into their field — for referrals, mentorship, coffee
@@ -25,26 +27,95 @@ LinkedIn; they happen through people willing to make space for someone else.
 
 ### Brand direction (carry forward into Phase 2)
 
-- **Palette:** butter-yellow background (~`#FDE47F`) as the dominant tone,
-  deep navy (~`#14304A`) for text and grounding sections, a single bright
-  cyan accent (~`#1FB6D8`) used sparingly for buttons/highlights.
-- **Logo:** "گفتگو" in Aref Ruqaa, paired with "GUFTAGOO" in Latin small
-  caps. Nav treatment: cyan circular badge, navy Urdu wordmark inside,
-  legible size (~44–48px+).
+- **Palette (final — keep as is):**
+  - Cream `#f9f5eb` — dominant page background (panels and inputs `#fffdf8`)
+  - Deep navy `#1c214a` — text, buttons, dark sections and footer
+  - Cyan `#1d9fb6` — accent for highlights, focus states, checked options
+    (lighter `#55c8cb` on navy; hero logo card `#27b0c7`)
+  - Warm amber `#f5ba52` — closing CTA section and small highlights
+  - Mint `#e7f5f2` / `#bfe9e7` — "How it works" section, soft shapes
+  - Muted grey `#52536a` — secondary body text
+
+  Avoid introducing colors outside this set.
+- **Logo:** a text wordmark, `گفتگو | GUFTAGOO` — the Urdu in Aref Ruqaa,
+  a thin cyan divider, then "GUFTAGOO" in Space Mono small caps. No circle
+  or badge. Navy on light backgrounds, cream on navy. The hero card still
+  shows the original PNG logo.
+- **Fonts:** Instrument Serif (headlines), DM Sans (body), Space Mono
+  (small uppercase labels), Aref Ruqaa (Urdu wordmark). All load from
+  Google Fonts.
 - **Tone:** warm, human, editorial — not generic tech/SaaS. No mascot.
 - **One CTA per audience, repeated** — avoid competing buttons.
 
 ### What's built and live
 
-- A mentor-recruitment landing page: hero, "why this exists" quote section,
-  "how it works" (4 steps), closing CTA.
-- A mentor signup form collecting: name, email, field/industry, years of
-  experience, and how they'd like to help (multi-select).
-- Backend persistence on Supabase; deployed and live on Vercel.
-- Originally built on Replit, migrated to Cursor + Supabase + Vercel.
+- **Stack:** a single-page React + Vite + Tailwind site in
+  `artifacts/guftagoo` (pnpm workspace). Code on GitHub
+  (`bakhtawar-i/Guftagoo`); deployed on Vercel from `main` using
+  `vercel.json` (Vercel's Root Directory must stay at the repo root). Every
+  merge to `main` redeploys automatically. Originally built on Replit; all
+  Replit-specific code has been removed.
+- **No server code.** The browser inserts signups directly into Supabase
+  using the public URL and publishable key (`VITE_SUPABASE_URL`,
+  `VITE_SUPABASE_PUBLISHABLE_KEY`, set in Vercel and in a git-ignored
+  `.env` locally).
+- **Landing page:** nav (Why Guftagoo / How it works / "Sign up as a
+  Mentor"), hero, navy "Why this exists" quote section, "How it works" (4
+  steps: Sign up → Get verified → Get matched → Give back), amber closing
+  CTA, footer. Only one audience today: every CTA opens the mentor form.
+- **Mentor form** (pop-up, all fields required):
+  - Name, email
+  - Field — 8 options: Technology & engineering / Product & design /
+    Finance & consulting / Medicine & healthcare / Law & policy /
+    Marketing & communications / Education & research / Other
+  - Years of experience — 0–2 / 3–5 / 6–10 / 10+ years
+  - How would you like to help? (multi-select, ≥1) — Referrals / Career
+    advice / Mock interviews
+  - **No LinkedIn URL field and no consent checkbox yet.**
+- **Database:** one Supabase table, `mentor_signups` (id uuid, created_at,
+  name, email, field, years_experience, help_options text[]). `check`
+  constraints only accept the form's exact option values. Row-level
+  security: the public key can insert only — never read, edit or delete.
+  Signups are reviewed in Supabase's Table Editor. There is no `status`
+  column and no verification workflow yet.
+- **Email:** none. No email provider, no sending domain, and no
+  confirmation email is sent on signup.
+- **Tests:** 4 unit tests for the form logic and the Supabase insert
+  (`pnpm test`).
+- No admin UI, no accounts or login.
 
-*(Agent: replace/expand this section with what you actually find in the
-codebase before proceeding.)*
+### Gaps to close in Phase 2
+
+- **LinkedIn URL and consent** — missing from the mentor form (see 2.2).
+- **Taxonomy differs from 2.1.** Fields (8 → 10), help options (3 → 5)
+  and experience ranges (→ seniority bands) all change. The database
+  `check` constraints must be migrated together with the form, and existing
+  rows mapped:
+  - Seniority maps directly: 0–2 → Student/entry, 3–5 → Early career,
+    6–10 → Mid career, 10+ → Senior.
+  - Help options: Referrals → Referral, Career advice → Mentorship (to
+    confirm), Mock interviews → Mock interview.
+  - Fields with a clear match: Medicine & healthcare → Medicine/Healthcare,
+    Law & policy → Law, Marketing & communications → Marketing/Sales,
+    Education & research → Academia/Research, Product & design → Design,
+    Other → Other.
+  - **Ambiguous, needs a decision:** Technology & engineering (Software/Tech
+    or Engineering (non-software)?) and Finance & consulting (Finance or
+    Consulting?).
+- **Existing mentor signups** have no LinkedIn URL, consent or status —
+  decide whether to ask them to re-submit or keep them out of matching
+  until verified.
+- **Table naming:** 2.9 refers to a `mentors` table; the live table is
+  `mentor_signups`. Rename during the Phase 2 migration, or keep the
+  current name.
+- **Email infrastructure doesn't exist** — build-order step 5 means setting
+  it up from scratch, which first needs a domain Guftagoo owns (for
+  SPF/DKIM/DMARC) and a provider such as Resend.
+- **Server-side code doesn't exist** — Phase 2 needs it for sending email,
+  the cold-start check, accept/decline pages and the scheduled matching
+  job. Plan: Vercel Functions in this repo plus a scheduled job, with the
+  Supabase secret key stored only in Vercel. Note Vercel's free (Hobby)
+  plan limits scheduled jobs to once a day.
 
 ## 2. Phase 2 — build this now
 
